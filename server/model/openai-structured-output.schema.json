@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://krishimitra.local/server/model/openai-structured-output.schema.json",
+  "title": "KrishiMitra OpenAI Grounded Advisory Explanation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "summary",
+    "urgency",
+    "actionExplanations",
+    "avoidedActionExplanations",
+    "questions",
+    "uncertaintyNotice",
+    "escalationNotice"
+  ],
+  "properties": {
+    "summary": {
+      "type": "string"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": ["routine", "soon", "urgent", "officer_review"]
+    },
+    "actionExplanations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actionExplanation"
+      }
+    },
+    "avoidedActionExplanations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actionExplanation"
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "uncertaintyNotice": {
+      "type": "string"
+    },
+    "escalationNotice": {
+      "type": ["string", "null"]
+    }
+  },
+  "$defs": {
+    "actionExplanation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actionId", "explanation"],
+      "properties": {
+        "actionId": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

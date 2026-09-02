@@ -1,0 +1,298 @@
+/* ── NdviPage layout ──────────────────────────────────────────── */
+
+.ndvi-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 32px 32px 48px;
+  min-height: 100vh;
+  background: #f2f6f0;
+}
+
+/* Header */
+.ndvi-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ndvi-page__title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a3020;
+  letter-spacing: -0.02em;
+}
+.ndvi-page__subtitle {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: #6b8070;
+}
+.ndvi-page__refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1.5px solid rgba(26,80,48,0.25);
+  border-radius: 10px;
+  background: #fff;
+  color: #1a5c2f;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  flex-shrink: 0;
+}
+.ndvi-page__refresh-btn:hover {
+  background: #eaf3ec;
+  box-shadow: 0 2px 8px rgba(26,80,48,0.12);
+}
+
+/* Body: 2-column grid */
+.ndvi-page__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+.ndvi-page__body--single {
+  grid-template-columns: 1fr;
+}
+
+/* ── Map card ──────────────────────────────────────────────────── */
+.ndvi-map-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 18px rgba(0,0,0,0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar: last check + improving badge */
+.ndvi-map-card__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e8f0e8;
+  gap: 12px;
+}
+.ndvi-map-card__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ndvi-map-card__check-icon {
+  color: #2e7d32;
+}
+.ndvi-map-card__check-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #7a9080;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.ndvi-map-card__check-time {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1a3020;
+  margin-top: 1px;
+}
+.ndvi-improving-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+/* Map container */
+.ndvi-map-card__map {
+  flex: 1;
+  height: 420px;
+  position: relative;
+}
+
+/* Stats row */
+.ndvi-map-card__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 16px 20px;
+  border-top: 1px solid #e8f0e8;
+  gap: 8px;
+}
+.ndvi-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ndvi-stat__label {
+  font-size: 0.7rem;
+  color: #7a9080;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.ndvi-stat__value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1a3020;
+}
+.ndvi-stat__value--green { color: #2e7d32; }
+
+/* Legend */
+.ndvi-legend {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 20px 16px;
+  flex-wrap: wrap;
+}
+.ndvi-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #3d5a45;
+}
+.ndvi-legend__dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ndvi-legend__dot--green  { background: #27ae60; }
+.ndvi-legend__dot--yellow { background: #f1c40f; }
+.ndvi-legend__dot--red    { background: #e74c3c; }
+
+/* ── Right sidebar ─────────────────────────────────────────────── */
+.ndvi-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Alert cards */
+.ndvi-alert-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  border-left: 5px solid transparent;
+}
+.ndvi-alert-card--warning { border-left-color: #f1c40f; }
+.ndvi-alert-card--danger  { border-left-color: #e74c3c; }
+
+.ndvi-alert-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ndvi-alert-card__icon--warning { color: #e6a817; }
+.ndvi-alert-card__icon--danger  { color: #c0392b; }
+.ndvi-alert-card__zone {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #1a3020;
+}
+.ndvi-alert-card__message {
+  margin: 0;
+  font-size: 0.83rem;
+  color: #4d6658;
+  line-height: 1.5;
+}
+
+/* Alert buttons */
+.ndvi-alert-card__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #dde8dd;
+  background: #fff;
+  color: #1a5c2f;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+.ndvi-alert-card__btn:hover {
+  background: #f2f9f4;
+  border-color: #b2d4bb;
+}
+.ndvi-alert-card__btn--danger {
+  background: #1a5c2f;
+  color: #fff;
+  border-color: transparent;
+}
+.ndvi-alert-card__btn--danger:hover {
+  background: #14472a;
+}
+
+/* Voice card */
+.ndvi-voice-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.ndvi-voice-card__title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a3020;
+  line-height: 1.4;
+}
+.ndvi-voice-card__btn {
+  display: grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(46,125,50,0.35);
+  transition: background 0.2s, transform 0.15s;
+}
+.ndvi-voice-card__btn:hover {
+  background: #1a5c2f;
+  transform: scale(1.05);
+}
+.ndvi-voice-card__hint {
+  font-size: 0.73rem;
+  color: #7a9080;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ndvi-page__body {
+    grid-template-columns: 1fr;
+  }
+  .ndvi-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .ndvi-page { padding: 20px 16px; }
+  .ndvi-map-card__stats { grid-template-columns: repeat(2, 1fr); }
+}

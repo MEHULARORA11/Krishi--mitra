@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://krishimitra.local/contracts/phased-implementation.schema.json",
+  "title": "KrishiMitra Phased Implementation Plan",
+  "type": "object",
+  "required": ["project", "status", "decisions", "phases", "workstreams", "hotFiles"],
+  "additionalProperties": false,
+  "properties": {
+    "project": {
+      "type": "string",
+      "const": "KrishiMitra"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proposed", "active", "paused", "complete"]
+    },
+    "frontendStack": {
+      "type": "string",
+      "const": "React 18 + Vite"
+    },
+    "backendStack": {
+      "type": "string",
+      "const": "Express"
+    },
+    "decisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/decision"
+      }
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/phase"
+      }
+    },
+    "workstreams": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/workstream"
+      }
+    },
+    "hotFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hotFile"
+      }
+    }
+  },
+  "$defs": {
+    "decision": {
+      "type": "object",
+      "required": ["id", "summary", "locked"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "summary": { "type": "string" },
+        "locked": { "type": "boolean" }
+      }
+    },
+    "phase": {
+      "type": "object",
+      "required": ["id", "name", "status", "serverPolicy", "owners", "tasks", "gate"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^phase-[0-9]+$" },
+        "name": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["not-started", "in-progress", "blocked", "complete"]
+        },
+        "serverPolicy": {
+          "type": "string",
+          "enum": ["read-only", "approved-hotfix-only", "changes-allowed"]
+        },
+        "owners": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tasks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "gate": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "workstream": {
+      "type": "object",
+      "required": ["name", "owner", "allowedPaths", "blockedPaths", "expectedOutcome"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "owner": { "type": "string" },
+        "allowedPaths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blockedPaths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "expectedOutcome": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "hotFile": {
+      "type": "object",
+      "required": ["path", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string" },
+        "owner": { "type": "string" }
+      }
+    }
+  }
+}

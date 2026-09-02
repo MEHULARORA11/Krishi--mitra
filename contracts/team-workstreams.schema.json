@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://krishimitra.local/contracts/team-workstreams.schema.json",
+  "title": "KrishiMitra Team Workstreams",
+  "type": "object",
+  "required": ["phase", "workstreams"],
+  "additionalProperties": false,
+  "properties": {
+    "phase": {
+      "type": "string"
+    },
+    "workstreams": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "teammate",
+          "mission",
+          "allowedPaths",
+          "avoidPaths",
+          "deliverables",
+          "acceptanceChecks"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "teammate": { "type": "string" },
+          "mission": { "type": "string" },
+          "allowedPaths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "avoidPaths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "deliverables": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "acceptanceChecks": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

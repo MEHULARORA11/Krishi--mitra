@@ -1,0 +1,22 @@
+{
+  "summary": "The accepted backend facts suggest early blight on tomato. Start with reviewed containment steps now, and use local agricultural officer support before any chemical treatment is considered.",
+  "urgency": "soon",
+  "actionExplanations": [
+    {
+      "actionId": "action_containment_001",
+      "explanation": "Removing visibly affected leaves and reducing leaf wetness can help slow spread while the field situation is reviewed."
+    }
+  ],
+  "avoidedActionExplanations": [
+    {
+      "actionId": "action_unreviewed_chemical",
+      "explanation": "This action stays blocked because no reviewed product and dosage record was approved in the backend facts for this demo case."
+    }
+  ],
+  "questions": [
+    "How many plants show the same symptom?",
+    "When was the last treatment or spray applied?"
+  ],
+  "uncertaintyNotice": "This explanation is grounded in backend-approved facts and does not replace on-field confirmation if symptoms spread.",
+  "escalationNotice": null
+}

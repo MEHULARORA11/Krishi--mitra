@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "krishimitra-model-manifest-v1",
+  "status": "phase5-lite-verified-contract",
+  "auditDate": "2026-08-21",
+  "modelVersion": "plantvillage-mobilenetv2-tfjs-v1",
+  "artifact": {
+    "path": "server/model/model.json",
+    "format": "tfjs-layers-model",
+    "generatedBy": "keras v3.13.2",
+    "convertedBy": "TensorFlow.js Converter v4.22.0"
+  },
+  "input": {
+    "shape": [1, 224, 224, 3],
+    "dtype": "float32"
+  },
+  "preprocessing": {
+    "resize": {
+      "width": 224,
+      "height": 224,
+      "fit": "fill"
+    },
+    "colorOrder": {
+      "value": "RGB",
+      "status": "matches_current_node_runtime"
+    },
+    "alphaHandling": "remove_alpha_channel",
+    "normalization": {
+      "value": "divide_by_255",
+      "inputRange": [0, 255],
+      "outputRange": [0, 1],
+      "status": "verified_against_current_node_runtime_only"
+    }
+  },
+  "labels": {
+    "source": "server/src/data/classNames.ts",
+    "count": 38,
+    "sha256": "916d510df0d836b382c6daa553a2fde564f227f8d0d33989f8ce24520202de12",
+    "status": "count_and_checksum_verified"
+  },
+  "output": {
+    "units": 38,
+    "activation": "softmax",
+    "confidenceUnit": "probability_0_to_1"
+  },
+  "thresholds": {
+    "acceptedPredictionMinimum": {
+      "value": 0.7,
+      "status": "phase5-lite-demo-threshold"
+    },
+    "unknownTop1Top2MarginMinimum": {
+      "value": 0.15,
+      "status": "documented_for_future_use"
+    }
+  },
+  "unknownBehavior": {
+    "returnUncertainty": "unknown",
+    "returnDiagnosisFields": {
+      "crop": null,
+      "disease": null
+    },
+    "approvedActionsPolicy": "containment_only_or_retake_photo",
+    "chemicalAdviceAllowed": false
+  },
+  "lowConfidenceBehavior": {
+    "returnUncertainty": "low_confidence",
+    "returnDiagnosisFields": {
+      "crop": null,
+      "disease": null
+    },
+    "approvedActionsPolicy": "retake_photo_or_officer_escalation_only",
+    "chemicalAdviceAllowed": false
+  },
+  "unsupportedImageBehavior": {
+    "returnRelevance": "unclear",
+    "returnUncertainty": "unsupported_image",
+    "approvedActionsPolicy": "request_supported_plant_image_only",
+    "chemicalAdviceAllowed": false
+  },
+  "integrationNotes": {
+    "backendModelSelection": "OPENAI_MODEL stays independent from the ML artifact version",
+    "loaderRequirement": "backend validates labels checksum, input shape, output units, and thresholds from this manifest",
+    "validationStatus": "phase5-lite verifies artifact contract and runtime parity only; no new training or fine-tuning"
+  }
+}

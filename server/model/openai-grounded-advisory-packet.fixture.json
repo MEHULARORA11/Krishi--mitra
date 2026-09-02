@@ -1,0 +1,53 @@
+{
+  "diagnosis": {
+    "crop": "Tomato",
+    "disease": "Early blight",
+    "confidence": 0.87,
+    "uncertainty": "accepted"
+  },
+  "fieldFacts": [
+    {
+      "code": "field_name",
+      "value": "East Tomato Field",
+      "sourceId": "field_demo_a"
+    },
+    {
+      "code": "active_crop",
+      "value": "Tomato at vegetative stage",
+      "sourceId": "crop_cycle_demo_001"
+    },
+    {
+      "code": "co_crop",
+      "value": "Onion at bulb formation stage",
+      "sourceId": "crop_cycle_demo_002"
+    },
+    {
+      "code": "soil_summary",
+      "value": "Soil moisture is good; latest soil report is not available.",
+      "sourceId": "soil_fixture_001"
+    }
+  ],
+  "weatherFacts": [
+    {
+      "code": "current_weather",
+      "value": "Warm weather with moderate humidity and no heavy rain warning.",
+      "observedAt": "2026-08-21T08:30:00+05:30",
+      "sourceId": "weather_fixture_001"
+    }
+  ],
+  "approvedActions": [
+    {
+      "id": "action_containment_001",
+      "safeText": "Remove visibly affected leaves, keep them away from healthy plants, and avoid overhead watering.",
+      "sourceIds": ["reviewed_action_demo_001"]
+    }
+  ],
+  "blockedActions": [
+    {
+      "id": "action_unreviewed_chemical",
+      "reasonCodes": ["not_reviewed_for_demo", "requires_officer_confirmation"]
+    }
+  ],
+  "missingData": ["latest_soil_test", "last_treatment_date"],
+  "requestedLanguage": "en"
+}

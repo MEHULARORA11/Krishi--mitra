@@ -1,0 +1,94 @@
+{
+  "requestId": "req_demo_001",
+  "analysisId": "analysis_demo_001",
+  "diagnosis": {
+    "relevance": "plant",
+    "crop": "Tomato",
+    "disease": "Early blight",
+    "confidence": 0.87,
+    "uncertainty": "accepted",
+    "modelVersion": "tfjs-demo-unverified-v0"
+  },
+  "contextUsed": {
+    "field": {
+      "id": "field_demo_a",
+      "name": "East Tomato Field",
+      "location": "Pune, Maharashtra"
+    },
+    "activeCrops": [
+      {
+        "crop": "Tomato",
+        "stage": "Vegetative"
+      },
+      {
+        "crop": "Onion",
+        "stage": "Bulb formation"
+      }
+    ],
+    "soil": {
+      "summary": "Soil moisture is good; latest soil report is not available.",
+      "sourceId": "soil_fixture_001"
+    },
+    "weather": {
+      "summary": "Warm weather with moderate humidity and no heavy rain warning.",
+      "observedAt": "2026-08-21T08:30:00+05:30",
+      "sourceId": "weather_fixture_001",
+      "freshness": "fixture"
+    }
+  },
+  "approvedActions": [
+    {
+      "id": "action_containment_001",
+      "title": "Remove affected leaves",
+      "safeText": "Remove visibly affected leaves, keep them away from healthy plants, and avoid overhead watering.",
+      "sourceIds": ["reviewed_action_demo_001"]
+    }
+  ],
+  "blockedActions": [
+    {
+      "id": "action_unreviewed_chemical",
+      "title": "Unreviewed chemical treatment",
+      "reasonCodes": ["not_reviewed_for_demo", "requires_officer_confirmation"]
+    }
+  ],
+  "explanation": {
+    "summary": "The image and field context suggest early blight on tomato. Start with containment today and confirm treatment with a local agricultural officer before using any chemical product.",
+    "urgency": "soon",
+    "actionExplanations": [
+      {
+        "actionId": "action_containment_001",
+        "explanation": "Removing affected leaves and reducing leaf wetness can slow spread while the diagnosis is confirmed."
+      }
+    ],
+    "avoidedActionExplanations": [
+      {
+        "actionId": "action_unreviewed_chemical",
+        "explanation": "Chemical treatment was not shown because no reviewed product and dosage record is approved for this demo case."
+      }
+    ],
+    "questions": [
+      "How many plants show symptoms?",
+      "When was the last spray or treatment applied?"
+    ],
+    "uncertaintyNotice": "This is an AI-assisted diagnosis and should be confirmed if symptoms spread.",
+    "escalationNotice": null
+  },
+  "missingData": ["latest_soil_test", "last_treatment_date"],
+  "escalation": {
+    "required": false,
+    "reason": null
+  },
+  "provenance": {
+    "ruleVersion": "rules-demo-v0",
+    "promptVersion": "openai-explanation-v0",
+    "schemaVersion": "api-v1-advisory-v0",
+    "modelVersion": "tfjs-demo-unverified-v0",
+    "sourceIds": ["soil_fixture_001", "weather_fixture_001", "reviewed_action_demo_001"]
+  },
+  "dataMode": {
+    "ml": "fixture",
+    "weather": "fixture",
+    "rules": "fixture",
+    "llm": "fixture"
+  }
+}

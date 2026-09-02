@@ -1,0 +1,90 @@
+{
+  "requestId": "req_demo_002",
+  "analysisId": "analysis_demo_002",
+  "diagnosis": {
+    "relevance": "unclear",
+    "crop": null,
+    "disease": null,
+    "confidence": 0.41,
+    "uncertainty": "low_confidence",
+    "modelVersion": "tfjs-demo-unverified-v0"
+  },
+  "contextUsed": {
+    "field": {
+      "id": "field_demo_a",
+      "name": "East Tomato Field",
+      "location": "Pune, Maharashtra"
+    },
+    "activeCrops": [
+      {
+        "crop": "Tomato",
+        "stage": "Vegetative"
+      }
+    ],
+    "soil": {
+      "summary": "Soil report is not available.",
+      "sourceId": "soil_fixture_002"
+    },
+    "weather": {
+      "summary": "Weather data is unavailable for this response.",
+      "observedAt": null,
+      "sourceId": "weather_unavailable",
+      "freshness": "unavailable"
+    }
+  },
+  "approvedActions": [
+    {
+      "id": "action_retake_photo",
+      "title": "Retake crop photo",
+      "safeText": "Retake the photo in daylight with one affected leaf clearly visible and in focus.",
+      "sourceIds": ["safe_workflow_demo_001"]
+    }
+  ],
+  "blockedActions": [
+    {
+      "id": "action_disease_treatment",
+      "title": "Disease-specific treatment",
+      "reasonCodes": ["low_confidence", "diagnosis_not_confirmed"]
+    }
+  ],
+  "explanation": {
+    "summary": "The image is not clear enough for a reliable crop disease result. Please retake the photo before acting on disease-specific treatment advice.",
+    "urgency": "officer_review",
+    "actionExplanations": [
+      {
+        "actionId": "action_retake_photo",
+        "explanation": "A clearer image helps avoid a wrong diagnosis and unnecessary treatment."
+      }
+    ],
+    "avoidedActionExplanations": [
+      {
+        "actionId": "action_disease_treatment",
+        "explanation": "Disease treatment was blocked because the model confidence is below the accepted threshold."
+      }
+    ],
+    "questions": [
+      "Can you upload a closer photo of the affected leaf?",
+      "Are the symptoms present on many plants or only one area?"
+    ],
+    "uncertaintyNotice": "No disease diagnosis was accepted from this image.",
+    "escalationNotice": "Contact a local agricultural officer if symptoms are spreading quickly."
+  },
+  "missingData": ["clear_crop_image", "symptom_spread"],
+  "escalation": {
+    "required": true,
+    "reason": "Low-confidence image result should not drive treatment."
+  },
+  "provenance": {
+    "ruleVersion": "rules-demo-v0",
+    "promptVersion": "openai-explanation-v0",
+    "schemaVersion": "api-v1-advisory-v0",
+    "modelVersion": "tfjs-demo-unverified-v0",
+    "sourceIds": ["safe_workflow_demo_001"]
+  },
+  "dataMode": {
+    "ml": "fixture",
+    "weather": "unavailable",
+    "rules": "fixture",
+    "llm": "fixture"
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "phase": "Phase 1 and Phase 2 frontend stabilization with backend and AI/ML preparation",
+  "workstreams": [
+    {
+      "name": "Frontend platform",
+      "teammate": "Frontend person 1",
+      "mission": "Stabilize the React/Vite shell so feature work can happen without route, provider, proxy, or API-client conflicts.",
+      "allowedPaths": [
+        "vite.config.js",
+        "src/App.jsx",
+        "src/main.jsx",
+        "src/components/layout/**",
+        "src/components/ui/**",
+        "src/lib/**",
+        "src/context/**",
+        "src/hooks/useApiClient.js",
+        "src/services/apiClient.js"
+      ],
+      "avoidPaths": [
+        "server/**",
+        "src/features/** after feature owner starts",
+        "feature-specific screen files"
+      ],
+      "deliverables": [
+        "Vite proxy includes every existing backend route used by the frontend.",
+        "App shell has stable router, providers, layout, and navigation.",
+        "Shared loading, error, empty, and data-mode components exist.",
+        "API client is provider-neutral and ready for schema validation."
+      ],
+      "acceptanceChecks": [
+        "npm run dev starts the React app on port 3000.",
+        "Protected routes do not crash.",
+        "Profile and history requests can reach Express through Vite.",
+        "No backend files are changed."
+      ]
+    },
+    {
+      "name": "Frontend feature screens",
+      "teammate": "Frontend person 2",
+      "mission": "Move page logic into feature folders and build the English dashboard experience in the shared visual direction.",
+      "allowedPaths": [
+        "src/features/home/**",
+        "src/features/advisory/**",
+        "src/features/farmer/**",
+        "src/features/weather/**",
+        "src/features/market/**",
+        "src/features/schemes/**",
+        "src/pages/** for thin wrappers"
+      ],
+      "avoidPaths": [
+        "server/**",
+        "vite.config.js",
+        "package.json",
+        "package-lock.json",
+        "src/main.jsx"
+      ],
+      "deliverables": [
+        "Dashboard resembles the reference screen: sidebar, weather card, scan crop CTA, market CTA, crop health cards, and AI insight card.",
+        "Each route delegates to a feature-owned screen.",
+        "Mock and fixture data are clearly labeled.",
+        "Visible UI copy is English and provider-neutral."
+      ],
+      "acceptanceChecks": [
+        "Existing routes still render.",
+        "Feature code lives primarily under src/features.",
+        "No new Gemini or OpenAI branding appears in UI copy.",
+        "No backend files are changed."
+      ]
+    },
+    {
+      "name": "Backend API preparation",
+      "teammate": "Backend person",
+      "mission": "Prepare route contracts and identify ahead-of-plan backend modules without changing runtime behavior during frontend stabilization.",
+      "allowedPaths": [
+        "contracts/**",
+        "docs/**",
+        "server/** after the frontend stability gate"
+      ],
+      "avoidPaths": [
+        "src/**",
+        "runtime backend behavior during Phase 1 and Phase 2"
+      ],
+      "deliverables": [
+        "Route inventory for current Express endpoints.",
+        "Request and response examples for frontend-used routes.",
+        "Plan for market, schemes, NDVI, and voice modules: keep behind flag, park, or defer.",
+        "Draft API v1 endpoint map for the grounded advisory workflow."
+      ],
+      "acceptanceChecks": [
+        "No existing frontend route breaks.",
+        "No new backend feature dependency is introduced into the frontend.",
+        "Compatibility expectations are documented before implementation."
+      ]
+    },
+    {
+      "name": "AI and ML preparation",
+      "teammate": "AI/ML person",
+      "mission": "Audit the checked-in disease model and prepare safe AI contracts before OpenAI implementation begins.",
+      "allowedPaths": [
+        "server/model/**",
+        "server/src/data/classNames.ts",
+        "ml/**",
+        "contracts/fixtures/**",
+        "docs/**"
+      ],
+      "avoidPaths": [
+        "src/**",
+        "server/src/routes/** unless coordinated with backend owner",
+        "server/src/app.ts"
+      ],
+      "deliverables": [
+        "Model input, preprocessing, label order, and confidence-unit audit.",
+        "Model manifest proposal with version, thresholds, labels checksum, and rejection behavior.",
+        "Accepted, low-confidence, and unsupported-image fixture expectations.",
+        "OpenAI structured explanation draft that cannot include chemical dosage fields."
+      ],
+      "acceptanceChecks": [
+        "ML output uses 0..1 confidence internally.",
+        "Low-confidence and unsupported-image cases are defined.",
+        "OpenAI is treated as an explanation layer, not a rule engine.",
+        "No frontend files are changed."
+      ]
+    }
+  ]
+}

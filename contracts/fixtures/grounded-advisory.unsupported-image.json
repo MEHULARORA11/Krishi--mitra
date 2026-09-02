@@ -1,0 +1,90 @@
+{
+  "requestId": "req_demo_003",
+  "analysisId": "analysis_demo_003",
+  "diagnosis": {
+    "relevance": "not_plant",
+    "crop": null,
+    "disease": null,
+    "confidence": null,
+    "uncertainty": "unsupported_image",
+    "modelVersion": "tfjs-demo-unverified-v0"
+  },
+  "contextUsed": {
+    "field": {
+      "id": "field_demo_a",
+      "name": "East Tomato Field",
+      "location": "Pune, Maharashtra"
+    },
+    "activeCrops": [
+      {
+        "crop": "Tomato",
+        "stage": "Vegetative"
+      }
+    ],
+    "soil": {
+      "summary": "Soil report is not available.",
+      "sourceId": "soil_fixture_003"
+    },
+    "weather": {
+      "summary": "Weather data was not used because the uploaded image was unsupported.",
+      "observedAt": null,
+      "sourceId": "weather_unused",
+      "freshness": "unavailable"
+    }
+  },
+  "approvedActions": [
+    {
+      "id": "action_upload_supported_photo",
+      "title": "Upload a plant leaf photo",
+      "safeText": "Upload one clear photo of the affected plant leaf in daylight, close to the symptoms, and without heavy background clutter.",
+      "sourceIds": ["safe_workflow_demo_002"]
+    }
+  ],
+  "blockedActions": [
+    {
+      "id": "action_disease_treatment",
+      "title": "Disease-specific treatment",
+      "reasonCodes": ["unsupported_image", "no_valid_diagnosis"]
+    }
+  ],
+  "explanation": {
+    "summary": "The uploaded image does not look like a usable plant disease photo, so no diagnosis or treatment advice was generated.",
+    "urgency": "routine",
+    "actionExplanations": [
+      {
+        "actionId": "action_upload_supported_photo",
+        "explanation": "A clear plant leaf photo is required before the system can safely evaluate disease symptoms."
+      }
+    ],
+    "avoidedActionExplanations": [
+      {
+        "actionId": "action_disease_treatment",
+        "explanation": "Disease-specific treatment was blocked because the image was unsupported and no plant diagnosis was accepted."
+      }
+    ],
+    "questions": [
+      "Can you upload one close photo of the affected leaf?",
+      "Is the symptom visible on leaves, stem, or fruit?"
+    ],
+    "uncertaintyNotice": "No diagnosis was accepted because the uploaded image was unsupported.",
+    "escalationNotice": null
+  },
+  "missingData": ["supported_plant_image"],
+  "escalation": {
+    "required": false,
+    "reason": null
+  },
+  "provenance": {
+    "ruleVersion": "rules-demo-v0",
+    "promptVersion": "openai-explanation-v0",
+    "schemaVersion": "api-v1-advisory-v0",
+    "modelVersion": "tfjs-demo-unverified-v0",
+    "sourceIds": ["safe_workflow_demo_002"]
+  },
+  "dataMode": {
+    "ml": "fixture",
+    "weather": "unavailable",
+    "rules": "fixture",
+    "llm": "fixture"
+  }
+}

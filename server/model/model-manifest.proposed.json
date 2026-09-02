@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "krishimitra-model-manifest-v1alpha1",
+  "status": "proposed",
+  "auditDate": "2026-08-21",
+  "modelVersion": "plantvillage-mobilenetv2-tfjs-unverified-v1",
+  "artifact": {
+    "path": "server/model/model.json",
+    "format": "tfjs-layers-model",
+    "generatedBy": "keras v3.13.2",
+    "convertedBy": "TensorFlow.js Converter v4.22.0"
+  },
+  "input": {
+    "shape": [1, 224, 224, 3],
+    "dtype": "float32"
+  },
+  "preprocessing": {
+    "resize": {
+      "width": 224,
+      "height": 224,
+      "fit": "fill",
+      "status": "matches_current_runtime_only",
+      "risk": "aspect_ratio_distortion"
+    },
+    "colorOrder": {
+      "value": "RGB",
+      "status": "inferred_from_current_runtime"
+    },
+    "alphaHandling": "remove_alpha_channel",
+    "normalization": {
+      "value": "divide_by_255",
+      "inputRange": [0, 255],
+      "outputRange": [0, 1],
+      "status": "unverified_against_training"
+    }
+  },
+  "labels": {
+    "source": "server/src/data/classNames.ts",
+    "count": 38,
+    "sha256": "916d510df0d836b382c6daa553a2fde564f227f8d0d33989f8ce24520202de12",
+    "status": "count_verified_semantic_order_requires_golden_images"
+  },
+  "output": {
+    "units": 38,
+    "activation": "softmax",
+    "confidenceUnit": "probability_0_to_1"
+  },
+  "thresholds": {
+    "acceptedPredictionMinimum": {
+      "value": 0.7,
+      "status": "provisional_until_validation"
+    },
+    "unknownTop1Top2MarginMinimum": {
+      "value": 0.15,
+      "status": "provisional_until_validation"
+    }
+  },
+  "unknownBehavior": {
+    "returnUncertainty": "unknown",
+    "returnDiagnosisFields": {
+      "crop": null,
+      "disease": null
+    },
+    "approvedActionsPolicy": "containment_only_or_retake_photo",
+    "chemicalAdviceAllowed": false
+  },
+  "lowConfidenceBehavior": {
+    "returnUncertainty": "low_confidence",
+    "returnDiagnosisFields": {
+      "crop": null,
+      "disease": null
+    },
+    "approvedActionsPolicy": "retake_photo_or_officer_escalation_only",
+    "chemicalAdviceAllowed": false
+  },
+  "unsupportedImageBehavior": {
+    "returnRelevance": "not_plant",
+    "returnUncertainty": "unsupported_image",
+    "approvedActionsPolicy": "request_supported_plant_image_only",
+    "chemicalAdviceAllowed": false
+  },
+  "testImageExpectations": [
+    {
+      "id": "clear_supported_demo_leaf",
+      "expectedRelevance": "plant",
+      "expectedUncertainty": "accepted",
+      "expectedCrop": "Tomato",
+      "expectedDisease": "Early blight",
+      "minimumConfidence": 0.7,
+      "notes": "Use a reviewed demo image from the supported crop/disease scenario."
+    },
+    {
+      "id": "clear_healthy_supported_leaf",
+      "expectedRelevance": "plant",
+      "expectedUncertainty": "accepted",
+      "expectedDisease": "Healthy",
+      "minimumConfidence": 0.7,
+      "notes": "Use a reviewed healthy leaf image from one of the supported label classes."
+    },
+    {
+      "id": "non_plant_or_phone_camera_misdirect",
+      "expectedRelevance": "not_plant",
+      "expectedUncertainty": "unsupported_image",
+      "expectedConfidence": null,
+      "notes": "Examples: hand, soil only, sky, machinery, packaging, or a full field scene without a target leaf."
+    },
+    {
+      "id": "blurry_or_dark_leaf_photo",
+      "expectedRelevance": "unclear",
+      "expectedUncertainty": "low_confidence",
+      "maximumConfidence": 0.69,
+      "notes": "The response should favor uncertainty over a forced diagnosis."
+    }
+  ],
+  "integrationNotes": {
+    "backendModelSelection": "OPENAI_MODEL must be independent from the ML artifact version",
+    "loaderRequirement": "backend should validate labels checksum, input shape, and preprocessing metadata at startup",
+    "validationStatus": "artifact audited only; not field-photo validated"
+  }
+}

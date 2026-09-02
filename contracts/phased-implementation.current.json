@@ -1,0 +1,168 @@
+{
+  "project": "KrishiMitra",
+  "status": "active",
+  "frontendStack": "React 18 + Vite",
+  "backendStack": "Express",
+  "decisions": [
+    {
+      "id": "decision-react-vite",
+      "summary": "Keep React 18 + Vite as the only frontend.",
+      "locked": true
+    },
+    {
+      "id": "decision-server-freeze",
+      "summary": "Keep server runtime behavior read-only during Phase 1 and Phase 2 frontend stabilization.",
+      "locked": true
+    },
+    {
+      "id": "decision-openai-config",
+      "summary": "Use the existing OpenAI model later through OPENAI_MODEL configuration.",
+      "locked": true
+    },
+    {
+      "id": "decision-sarvam-later",
+      "summary": "Defer Sarvam voice until the text advisory flow is stable.",
+      "locked": true
+    },
+    {
+      "id": "decision-safe-ai",
+      "summary": "The LLM explains approved facts and must not invent chemical dosage or safety rules.",
+      "locked": true
+    }
+  ],
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Freeze, contracts, and reproducible baseline",
+      "status": "in-progress",
+      "serverPolicy": "approved-hotfix-only",
+      "owners": ["Integration lead", "API contract owner"],
+      "tasks": [
+        "Record baseline commands and known failures.",
+        "Freeze current route request and response fixtures.",
+        "Assign hot-file owners.",
+        "Commit contract schemas and fixtures."
+      ],
+      "gate": [
+        "Everyone can run the current app.",
+        "Contract fixtures are committed.",
+        "Each contributor has an exclusive path assignment."
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "React/Vite stabilization foundation",
+      "status": "not-started",
+      "serverPolicy": "read-only",
+      "owners": ["Frontend platform owner"],
+      "tasks": [
+        "Fix Vite proxy for /users and /history.",
+        "Make router, providers, layout, and API client stable.",
+        "Create shared UI states for loading, error, empty, and data mode.",
+        "Keep UI text in English."
+      ],
+      "gate": [
+        "React/Vite starts on port 3000.",
+        "Protected routes work.",
+        "Profile and history calls reach Express through Vite.",
+        "Build and smoke checks pass."
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Feature isolation inside the React app",
+      "status": "not-started",
+      "serverPolicy": "read-only",
+      "owners": ["Frontend feature owner"],
+      "tasks": [
+        "Create feature-owned screens under src/features.",
+        "Keep src/pages as thin wrappers.",
+        "Build the English dashboard UI in the reference style.",
+        "Label mock and fixture data."
+      ],
+      "gate": [
+        "Feature code lives mainly in src/features.",
+        "Current routes still work.",
+        "No routine file conflicts between frontend owners."
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "OpenAI provider and safe advisory contract",
+      "status": "not-started",
+      "serverPolicy": "changes-allowed",
+      "owners": ["Backend API owner", "AI/ML owner"],
+      "tasks": [
+        "Introduce provider-neutral OpenAI boundary.",
+        "Use structured outputs and validated explanation schema.",
+        "Keep model selection in OPENAI_MODEL.",
+        "Preserve legacy route compatibility."
+      ],
+      "gate": [
+        "OpenAI output validates against schema.",
+        "No unreviewed chemical advice is generated.",
+        "Fallback path is safe and non-chemical."
+      ]
+    }
+  ],
+  "workstreams": [
+    {
+      "name": "Frontend platform",
+      "owner": "Frontend person 1",
+      "allowedPaths": ["vite.config.js", "src/App.jsx", "src/main.jsx", "src/components/layout/**", "src/components/ui/**", "src/lib/**"],
+      "blockedPaths": ["server/**", "src/features/** after feature owner starts"],
+      "expectedOutcome": ["Stable Vite proxy", "Stable app shell", "Provider-neutral API boundary"]
+    },
+    {
+      "name": "Frontend feature screens",
+      "owner": "Frontend person 2",
+      "allowedPaths": ["src/features/**", "src/pages/** for thin wrappers"],
+      "blockedPaths": ["server/**", "vite.config.js", "package.json", "src/main.jsx"],
+      "expectedOutcome": ["Dashboard screen in reference style", "Feature isolation", "Mock/fixture labels"]
+    },
+    {
+      "name": "Backend API",
+      "owner": "Backend person",
+      "allowedPaths": ["contracts/**", "docs/**", "server/** after frontend gate"],
+      "blockedPaths": ["src/** during Phase 1 and Phase 2"],
+      "expectedOutcome": ["Route inventory", "Compatibility plan", "Prepared API v1 boundary"]
+    },
+    {
+      "name": "AI/ML",
+      "owner": "AI/ML person",
+      "allowedPaths": ["server/model/**", "server/src/data/classNames.ts", "ml/**", "contracts/fixtures/**"],
+      "blockedPaths": ["src/**", "server/src/routes/** unless coordinated"],
+      "expectedOutcome": ["Model audit", "Manifest plan", "Safe OpenAI schema draft"]
+    }
+  ],
+  "hotFiles": [
+    {
+      "path": "package.json",
+      "owner": "Integration/dependency lead"
+    },
+    {
+      "path": "vite.config.js",
+      "owner": "Frontend platform owner"
+    },
+    {
+      "path": "src/App.jsx",
+      "owner": "Frontend platform owner"
+    },
+    {
+      "path": "src/main.jsx",
+      "owner": "Frontend platform owner"
+    },
+    {
+      "path": "server/src/app.ts",
+      "owner": "Backend API owner"
+    },
+    {
+      "path": "server/src/db/schema.ts",
+      "owner": "Database owner"
+    },
+    {
+      "path": "contracts/**",
+      "owner": "API contract owner"
+    }
+  ]
+}

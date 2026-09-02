@@ -1,0 +1,133 @@
+/* ── NdviMap component styles ─────────────────────────────────── */
+
+.ndvi-map-wrapper {
+  position: relative;
+  height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  background: #1a2a1a;
+}
+
+/* Locating */
+.ndvi-locating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 32px;
+  color: #4a7c59;
+  font-weight: 600;
+}
+.ndvi-locating__spinner {
+  width: 20px; height: 20px;
+  border: 3px solid rgba(74,124,89,0.3);
+  border-top-color: #4a7c59;
+  border-radius: 50%;
+  animation: ndvi-spin 0.8s linear infinite;
+}
+
+/* Loading overlay */
+.ndvi-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,20,10,0.65);
+  backdrop-filter: blur(6px);
+}
+.ndvi-loading-overlay__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+.ndvi-loading-overlay__inner p {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.ndvi-loading-overlay__inner span {
+  font-size: 0.82rem;
+  opacity: 0.7;
+}
+.ndvi-loading-overlay__spinner {
+  width: 40px; height: 40px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: #6fcf97;
+  border-radius: 50%;
+  animation: ndvi-spin 0.9s linear infinite;
+}
+
+/* Error overlay */
+.ndvi-error-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(180,30,30,0.08);
+  padding: 24px;
+  text-align: center;
+  color: #c0392b;
+  font-weight: 600;
+}
+.ndvi-retry-btn {
+  padding: 10px 28px;
+  border-radius: 10px;
+  background: #1a5c2f;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ndvi-retry-btn:hover { background: #14472a; }
+
+/* Status bar */
+.ndvi-status-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 18px;
+  background: rgba(10,20,10,0.72);
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
+.ndvi-status-bar__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e0ede5;
+  white-space: nowrap;
+}
+.ndvi-status-bar__dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ndvi-status-bar__dot--green  { background: #27ae60; }
+.ndvi-status-bar__dot--yellow { background: #f1c40f; }
+.ndvi-status-bar__dot--red    { background: #e74c3c; }
+.ndvi-status-bar__divider {
+  flex: 1;
+}
+.ndvi-status-bar__meta {
+  font-size: 0.73rem;
+  color: rgba(224,237,229,0.55);
+  white-space: nowrap;
+}
+
+@keyframes ndvi-spin {
+  to { transform: rotate(360deg); }
+}
