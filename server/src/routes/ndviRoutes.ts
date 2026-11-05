@@ -1,3 +1,4 @@
+import sharp from 'sharp'
 import { Router } from 'express'
 import { ndviQuerySchema } from '../schemas/requestSchemas.js'
 import { getNdviSnapshot, getNdviTrend } from '../services/ndviService.js'
@@ -47,6 +48,7 @@ ndviRoutes.get(
 )
 
 import axios from 'axios';
+import { env } from '../config/env.js';
 import { getAccessToken } from '../services/copernicusAuth.js';
 
 const imageCache = new Map<string, string>();
@@ -75,6 +77,102 @@ const ndviEvalscript = `
   }
 `;
 
+const generateMockNdviTile = async (): Promise<string> => {
+  const svg = `<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g1" cx="35%" cy="40%" r="55%">
+        <stop offset="0%" stop-color="#27ae60" stop-opacity="0.75" />
+        <stop offset="65%" stop-color="#2ecc71" stop-opacity="0.65" />
+        <stop offset="90%" stop-color="#f1c40f" stop-opacity="0.55" />
+        <stop offset="100%" stop-color="#e67e22" stop-opacity="0.5" />
+      </radialGradient>
+      <radialGradient id="g2" cx="70%" cy="65%" r="40%">
+        <stop offset="0%" stop-color="#229954" stop-opacity="0.7" />
+        <stop offset="70%" stop-color="#27ae60" stop-opacity="0.6" />
+        <stop offset="100%" stop-color="#f39c12" stop-opacity="0.4" />
+      </radialGradient>
+    </defs>
+    <rect width="512" height="512" fill="url(#g1)" />
+    <circle cx="360" cy="330" r="140" fill="url(#g2)" />
+    <circle cx="160" cy="200" r="100" fill="#27ae60" fill-opacity="0.7" />
+    <circle cx="430" cy="120" r="60" fill="#f1c40f" fill-opacity="0.55" />
+  </svg>`
+  const buffer = await sharp(Buffer.from(svg)).png().toBuffer()
+  return `data:image/png;base64,${buffer.toString('base64')}`
+}
+
+const polygonCache = new Map<string, string>();
+
+async function getOrCreateAgromonitoringPolygon(bbox: number[], apiKey: string): Promise<string> {
+  const polyKey = bbox.map((n) => n.toFixed(4)).join(',');
+  if (polygonCache.has(polyKey)) {
+    return polygonCache.get(polyKey)!;
+  }
+
+  const payload = {
+    name: `Field_${polyKey.replace(/[.,]/g, '_')}`,
+    geo_json: {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [bbox[0], bbox[1]],
+            [bbox[2], bbox[1]],
+            [bbox[2], bbox[3]],
+            [bbox[0], bbox[3]],
+            [bbox[0], bbox[1]],
+          ],
+        ],
+      },
+    },
+  };
+
+  const res = await axios.post(
+    `https://api.agromonitoring.com/agro/1.0/polygons?appid=${apiKey}`,
+    payload,
+    { headers: { 'Content-Type': 'application/json' }, timeout: 8000 }
+  );
+
+  const polyId = res.data.id as string;
+  polygonCache.set(polyKey, polyId);
+  return polyId;
+}
+
+async function fetchFromAgromonitoring(bbox: number[], apiKey: string): Promise<{ imageSrc: string; stats?: any } | null> {
+  const polyId = await getOrCreateAgromonitoringPolygon(bbox, apiKey);
+  const now = Math.floor(Date.now() / 1000);
+  const start = now - 90 * 24 * 3600;
+
+  const searchRes = await axios.get(
+    `https://api.agromonitoring.com/agro/1.0/image/search?start=${start}&end=${now}&polyid=${polyId}&appid=${apiKey}`,
+    { timeout: 8000 }
+  );
+
+  const images = searchRes.data;
+  if (!Array.isArray(images) || images.length === 0) {
+    return null;
+  }
+
+  images.sort((a: any, b: any) => (a.cl ?? 100) - (b.cl ?? 100) || b.dt - a.dt);
+  const best = images[0];
+
+  const ndviUrl = best.image?.ndvi;
+  if (!ndviUrl) return null;
+
+  const imageRes = await axios.get(`${ndviUrl}&appid=${apiKey}`, {
+    responseType: 'arraybuffer',
+    timeout: 10000,
+  });
+
+  const base64Image = Buffer.from(imageRes.data, 'binary').toString('base64');
+  return {
+    imageSrc: `data:image/png;base64,${base64Image}`,
+    stats: best.stats?.ndvi || null,
+  };
+}
+
 ndviRoutes.post(
   '/api/ndvi/generate',
   asyncHandler(async (req, res) => {
@@ -88,6 +186,27 @@ ndviRoutes.post(
     if (imageCache.has(cacheKey)) {
       res.json({ imageSrc: imageCache.get(cacheKey), bounds: bbox });
       return;
+    }
+
+    // Try Agromonitoring first if key is configured
+    if (env.agromonitoringApiKey?.trim()) {
+      try {
+        console.log('[NDVI] Fetching live satellite imagery from Agromonitoring...');
+        const liveResult = await fetchFromAgromonitoring(bbox, env.agromonitoringApiKey.trim());
+        if (liveResult?.imageSrc) {
+          imageCache.set(cacheKey, liveResult.imageSrc);
+          res.json({
+            imageSrc: liveResult.imageSrc,
+            bounds: bbox,
+            stats: liveResult.stats,
+            isMock: false,
+            source: 'Agromonitoring (Sentinel-2 L2A)',
+          });
+          return;
+        }
+      } catch (err: any) {
+        console.warn('[NDVI] Agromonitoring notice:', err.response?.data?.message || err.message);
+      }
     }
 
     try {
@@ -154,15 +273,20 @@ ndviRoutes.post(
         error?.message ||
         'Unknown error';
 
-      console.error('[NDVI] Sentinel API error', { status, detail, body });
-
-      const clientMsg =
-        status === 401 ? `Auth failed (401): ${detail} — check SENTINEL_CLIENT_ID / SENTINEL_CLIENT_SECRET in server/.env` :
-        status === 400 ? `Bad request (400): ${detail}` :
-        status === 403 ? `Access denied (403): ${detail}` :
-        `Sentinel Hub error ${status ?? ''}: ${detail}`;
-
-      res.status(status ?? 500).json({ error: clientMsg });
+      console.warn('[NDVI] Sentinel API unavailable or invalid credentials; serving mock NDVI overlay.', { status, detail });
+      try {
+        const mockImage = await generateMockNdviTile();
+        imageCache.set(cacheKey, mockImage);
+        res.json({ imageSrc: mockImage, bounds: bbox, isMock: true });
+        return;
+      } catch {
+        const clientMsg =
+          status === 401 ? `Auth failed (401): ${detail} — check SENTINEL_CLIENT_ID / SENTINEL_CLIENT_SECRET in server/.env` :
+          status === 400 ? `Bad request (400): ${detail}` :
+          status === 403 ? `Access denied (403): ${detail}` :
+          `Sentinel Hub error ${status ?? ''}: ${detail}`;
+        res.status(status ?? 500).json({ error: clientMsg });
+      }
     }
   })
 )

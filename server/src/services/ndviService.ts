@@ -127,6 +127,64 @@ function computeTrend(values: number[]): 'improving' | 'stable' | 'declining' {
  * Fetch NDVI snapshot for a given location.
  * For hackathon: creates a small bounding box around the centroid.
  */
+async function fetchFromAgromonitoringSnapshot(lat: number, lng: number, apiKey: string): Promise<NdviSnapshot | null> {
+  const delta = 0.005
+  const bbox = [lng - delta, lat - delta, lng + delta, lat + delta]
+  const polyKey = `poly_${lat.toFixed(3)}_${lng.toFixed(3)}`
+
+  const payload = {
+    name: polyKey,
+    geo_json: {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [bbox[0], bbox[1]],
+            [bbox[2], bbox[1]],
+            [bbox[2], bbox[3]],
+            [bbox[0], bbox[3]],
+            [bbox[0], bbox[1]],
+          ],
+        ],
+      },
+    },
+  }
+
+  const polyRes = await axios.post(
+    `https://api.agromonitoring.com/agro/1.0/polygons?appid=${apiKey}`,
+    payload,
+    { headers: { 'Content-Type': 'application/json' }, timeout: 8000 }
+  )
+
+  const polyId = polyRes.data.id as string
+  const now = Math.floor(Date.now() / 1000)
+  const start = now - 90 * 24 * 3600
+
+  const searchRes = await axios.get(
+    `https://api.agromonitoring.com/agro/1.0/image/search?start=${start}&end=${now}&polyid=${polyId}&appid=${apiKey}`,
+    { timeout: 8000 }
+  )
+
+  const images = searchRes.data
+  if (!Array.isArray(images) || images.length === 0) return null
+
+  images.sort((a: any, b: any) => (a.cl ?? 100) - (b.cl ?? 100) || b.dt - a.dt)
+  const best = images[0]
+  const meanNdvi = best.stats?.ndvi?.mean ?? 0.65
+
+  return {
+    ndviValue: Math.round(meanNdvi * 100) / 100,
+    cloudCover: Math.round(best.cl ?? 0),
+    captureDate: new Date(best.dt * 1000).toISOString().split('T')[0],
+    tileSource: 'Sentinel-2 L2A (Agromonitoring)',
+    healthLabel: ndviToHealthLabel(meanNdvi),
+    centroidLat: lat,
+    centroidLng: lng,
+  }
+}
+
 export const getNdviSnapshot = async (
   lat: number,
   lng: number,
@@ -138,18 +196,28 @@ export const getNdviSnapshot = async (
     return cached
   }
 
-  let snapshot: NdviSnapshot
+  let snapshot: NdviSnapshot | null = null
 
-  if (!env.sentinelClientId || !env.sentinelClientSecret) {
-    console.warn('[ndvi] No Sentinel credentials — returning mock data')
-    snapshot = generateMockNdvi(lat, lng)
-  } else {
+  if (env.agromonitoringApiKey?.trim()) {
     try {
-      snapshot = await fetchFromSentinel(lat, lng)
-    } catch (err) {
-      console.error('[ndvi] Sentinel fetch failed, using mock:', err)
-      snapshot = generateMockNdvi(lat, lng)
+      snapshot = await fetchFromAgromonitoringSnapshot(lat, lng, env.agromonitoringApiKey.trim())
+    } catch (err: any) {
+      console.warn('[ndvi] Agromonitoring snapshot notice:', err.response?.data?.message || err.message)
     }
+  }
+
+  if (!snapshot) {
+    if (env.sentinelClientId && env.sentinelClientSecret) {
+      try {
+        snapshot = await fetchFromSentinel(lat, lng)
+      } catch (err) {
+        console.error('[ndvi] Sentinel fetch failed, using mock:', err)
+      }
+    }
+  }
+
+  if (!snapshot) {
+    snapshot = generateMockNdvi(lat, lng)
   }
 
   ndviCache.set(cacheKey, snapshot, CACHE_TTL_SECONDS)

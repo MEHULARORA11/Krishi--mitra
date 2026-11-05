@@ -867,9 +867,30 @@ export default function AdvisoryScreen() {
 
   const handleAnalyzeImage = async () => {
     if (!pendingImageFile) return
-    if (!selectedFieldId) {
-      setScanError(t('scannerSelectFieldFirst'))
-      return
+    let activeFieldId = selectedFieldId
+
+    if (!activeFieldId) {
+      if (!workspace?.farms?.length) {
+        try {
+          setSettingUpWorkspace(true)
+          const created = await advisoryClient.createDemoWorkspace()
+          await loadWorkspace()
+          activeFieldId = created?.field?.id || ''
+          if (created?.field?.id) {
+            setSelectedFieldId(created.field.id)
+            setSelectedZoneId(created.zone?.id || '')
+          }
+        } catch {
+          setScanError(t('scannerSelectFieldFirst'))
+          return
+        } finally {
+          setSettingUpWorkspace(false)
+        }
+      }
+      if (!activeFieldId) {
+        setScanError(t('scannerSelectFieldFirst'))
+        return
+      }
     }
 
     setScanError(null)
@@ -879,7 +900,7 @@ export default function AdvisoryScreen() {
     try {
       const result = await advisoryClient.analyzeImageV1({
         imageFile: pendingImageFile,
-        fieldId: selectedFieldId,
+        fieldId: activeFieldId,
         zoneId: selectedZoneId || null,
         language: currentLanguage,
         affectedAreaPercent,
@@ -1029,16 +1050,16 @@ export default function AdvisoryScreen() {
                   className={`upload-box ${scanImage ? 'upload-box--has-image' : ''} ${isDraggingImage ? 'upload-box--dragging' : ''}`}
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  onDragEnter={(event) => { event.preventDefault(); if (!scanning && selectedFieldId) setIsDraggingImage(true) }}
+                  onDragEnter={(event) => { event.preventDefault(); if (!scanning) setIsDraggingImage(true) }}
                   onDragOver={(event) => event.preventDefault()}
                   onDragLeave={() => setIsDraggingImage(false)}
                   onDrop={(event) => {
                     event.preventDefault()
                     setIsDraggingImage(false)
                     const file = event.dataTransfer.files?.[0]
-                    if (file && !scanning && selectedFieldId) handleImageSelection(file)
+                    if (file && !scanning) handleImageSelection(file)
                   }}
-                  disabled={scanning || !selectedFieldId}
+                  disabled={scanning}
                   aria-label={t('uploadCropImage')}
                 >
                   {scanImage ? (
@@ -1072,7 +1093,7 @@ export default function AdvisoryScreen() {
                   </div>
                 )}
 
-                {!scanImage && !scanning && selectedFieldId && (
+                {!scanImage && !scanning && (
                   <aside className="scanner-photo-guide" aria-label={t('scannerPhotoTipsLabel')}>
                     <div className="scanner-photo-guide__title"><Camera size={17} /> {t('scannerPhotoGuideTitle')}</div>
                     <ul><li>{t('scannerPhotoTipOne')}</li><li>{t('scannerPhotoTipTwo')}</li><li>{t('scannerPhotoTipThree')}</li></ul>

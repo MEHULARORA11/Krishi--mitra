@@ -36,4 +36,5 @@ export const env = {
   sentinelClientId: process.env.SENTINEL_CLIENT_ID || '',
   sentinelClientSecret: process.env.SENTINEL_CLIENT_SECRET || '',
   dataGovApiKey: process.env.DATA_GOV_API_KEY || '',
+  agromonitoringApiKey: process.env.AGROMONITORING_API_KEY || '',
 }

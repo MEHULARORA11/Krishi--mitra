@@ -29,6 +29,13 @@
       "when": 1787379000000,
       "tag": "0003_ecosystem_advisory_repair",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793358124296,
+      "tag": "0004_previous_vengeance",
+      "breakpoints": true
     }
   ]
 }

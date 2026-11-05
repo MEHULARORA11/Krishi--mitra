@@ -193,21 +193,51 @@ const logProviderResult = (
 }
 
 class OpenAiStructuredExplanationProvider implements AiExplanationProvider {
-  private readonly client: OpenAI
+  private client: OpenAI | null = null
+  private currentKey: string = ''
 
-  constructor() {
-    this.client = new OpenAI({
-      apiKey: env.openaiApiKey,
-    })
+  private getClient(): OpenAI | null {
+    const key = (process.env.OPENAI_API_KEY || env.openaiApiKey || '').trim()
+    if (!key) return null
+    if (!this.client || this.currentKey !== key) {
+      try {
+        this.client = new OpenAI({ apiKey: key })
+        this.currentKey = key
+      } catch (err) {
+        console.warn('[OpenAI] Failed to instantiate OpenAI client:', (err as Error).message)
+        return null
+      }
+    }
+    return this.client
   }
 
   async generateExplanation(packet: GroundedAdvisoryPacket) {
     const startedAt = Date.now()
+    const client = this.getClient()
+    const model = (process.env.OPENAI_MODEL || env.openaiModel || '').trim()
+
+    if (!client || !model) {
+      const explanation = buildFallbackExplanation(packet, 'fallback')
+      const meta: ExplanationGenerationMeta = {
+        provider: OPENAI_PROVIDER,
+        model: model || 'none',
+        promptVersion: ADVISORY_PROMPT_VERSION,
+        schemaVersion: ADVISORY_SCHEMA_VERSION,
+        latencyMs: Date.now() - startedAt,
+        outcome: 'fallback',
+        tokenUsage: {
+          inputTokens: null,
+          outputTokens: null,
+          totalTokens: null,
+        },
+      }
+      return { explanation, meta }
+    }
 
     try {
-      const response = await this.client.responses.create(
+      const response = await client.responses.create(
         {
-          model: env.openaiModel,
+          model,
           input: [
             {
               role: 'system',
